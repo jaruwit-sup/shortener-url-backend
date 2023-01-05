@@ -1,10 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'url' })
 export class Url {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  id: string;
 
-  @Column({ type: 'varchar', length: 300 })
-  name: string;
+  @Column({ name: 'long_url' })
+  longUrl: string;
+
+  @Column({ name: 'short_url' })
+  shortUrl: string;
+
+  @CreateDateColumn({ name: 'created_date' })
+  createdDate: Date;
 }

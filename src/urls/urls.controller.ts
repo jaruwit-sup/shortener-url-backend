@@ -1,34 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Res } from '@nestjs/common';
 import { UrlsService } from './urls.service';
-import { CreateUrlDto } from './dto/create-url.dto';
-import { UpdateUrlDto } from './dto/update-url.dto';
+import { CreateShortUrlDto } from './dto/create-short-url.dto';
 
 @Controller('urls')
 export class UrlsController {
   constructor(private readonly urlsService: UrlsService) {}
 
-  @Post()
-  create(@Body() createUrlDto: CreateUrlDto) {
-    return this.urlsService.create(createUrlDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.urlsService.findAll();
+  @Post('/shorten')
+  async shorten(@Body() createShortUrlDto: CreateShortUrlDto) {
+    return this.urlsService.shorten(createShortUrlDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.urlsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUrlDto: UpdateUrlDto) {
-    return this.urlsService.update(+id, updateUrlDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.urlsService.remove(+id);
+  async redirect(@Param('id') id: string, @Res() res) {
+    const longUrl: string = await this.urlsService.getLongUrl(id);
+    return res.redirect(longUrl);
   }
 }

@@ -23,6 +23,12 @@ class ConfigService {
       ssl: true,
     };
   }
+
+  public getBaseUrl() {
+    return process.env.NODE_ENV === 'production'
+      ? 'https://nestjs-s7r1.onrender.com'
+      : `http://localhost:${this.getPort()}`;
+  }
 }
 
 const configService = new ConfigService(process.env);
