@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Url } from 'src/entities/url.entity';
 import { Repository } from 'typeorm';
@@ -22,6 +22,11 @@ export class UrlsService {
   }
 
   async shorten(createShortUrlDto: CreateShortUrlDto): Promise<Url> {
+    //checks if longurl is a valid URL
+    if (!this.isUrl(createShortUrlDto.longUrl)) {
+      throw new BadRequestException('URL is not valid.');
+    }
+
     const id = generate();
     const baseUrl = configService.getBaseUrl();
     const url = new Url();
@@ -31,8 +36,12 @@ export class UrlsService {
     return await this.create(url);
   }
 
-  async getLongUrl(id: string): Promise<string> {
-    const url: Url = await this.findOne(id);
-    return url.longUrl;
+  isUrl(url: string): boolean {
+    try {
+      new URL(url);
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 }
