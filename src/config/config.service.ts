@@ -5,7 +5,7 @@ class ConfigService {
   constructor(private env: { [k: string]: string | undefined }) {}
 
   public getPort() {
-    return process.env.PORT;
+    return this.env.PORT;
   }
 
   public getTypeOrmConfig(): TypeOrmModuleOptions {
@@ -17,17 +17,15 @@ class ConfigService {
       username: this.env.POSTGRES_USER,
       password: this.env.POSTGRES_PASSWORD,
       database: this.env.POSTGRES_DATABASE,
+      ssl: JSON.parse(this.env.SSL),
       entities: ['dist/**/*.entity.js'],
       synchronize: true,
       logging: true,
-      ssl: true,
     };
   }
 
   public getBaseUrl() {
-    return process.env.NODE_ENV === 'production'
-      ? 'https://nestjs-s7r1.onrender.com'
-      : `http://localhost:${this.getPort()}`;
+    return this.env.BASE_URL;
   }
 }
 
