@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateShortUrlDto } from './dto/create-short-url.dto';
 import { generate } from 'shortid';
 import { configService } from '../config/config.service';
+import { autoAddProtocol, isUrl } from 'src/utils/url.util';
 
 @Injectable()
 export class UrlsService {
@@ -22,8 +23,11 @@ export class UrlsService {
   }
 
   async shorten(createShortUrlDto: CreateShortUrlDto): Promise<Url> {
-    //checks if longurl is a valid URL
-    if (!this.isUrl(createShortUrlDto.longUrl)) {
+    // auto add protocol in case user submit url without protocol
+    const urlWithProtocol: string = autoAddProtocol(createShortUrlDto.longUrl);
+
+    // checks if URL is not valid
+    if (!isUrl(urlWithProtocol)) {
       throw new BadRequestException('URL is not valid.');
     }
 
@@ -31,17 +35,8 @@ export class UrlsService {
     const baseUrl = configService.getBaseUrl();
     const url = new Url();
     url.id = id;
-    url.longUrl = createShortUrlDto.longUrl;
+    url.longUrl = urlWithProtocol;
     url.shortUrl = `${baseUrl}/urls/${id}`;
     return await this.create(url);
-  }
-
-  isUrl(url: string): boolean {
-    try {
-      new URL(url);
-      return true;
-    } catch (err) {
-      return false;
-    }
   }
 }
